@@ -60,7 +60,7 @@ def departures_for(crs):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='National Rail Data REST Server')
-    parser.add_argument('--db', help='SQLite DB Name', default="trains.db")
+    parser.add_argument('--db', help='SQLite DB Name', default="../data/trains.db")
     args = parser.parse_args()
 
     db = args.db

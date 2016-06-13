@@ -2,11 +2,11 @@ import argparse
 
 from osgb import osgb_to_lonlat
 from osgb.convert import eastnorth_to_osgb
+from utils.database import insert_into_db
 
 # Loads data from here: https://data.gov.uk/dataset/naptan
 
 # create table stations (crs TEXT, name TEXT, easting INT, northing INT, latitude DOUBLE, longitude DOUBLE);
-from collector.database import insert_into_db
 
 
 def read_stations(filename):
@@ -24,7 +24,7 @@ def read_stations(filename):
 def convert(row):
     e = row["easting"]
     n = row["northing"]
-    lon, lat = osgb_to_lonlat(eastnorth_to_osgb(e, n, digits=4)) #osgb36_to_wgs84(e, n)
+    lon, lat = osgb_to_lonlat(eastnorth_to_osgb(e, n, digits=4))
 
     row["latitude"] = lat
     row["longitude"] = lon

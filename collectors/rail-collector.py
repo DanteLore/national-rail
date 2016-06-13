@@ -3,13 +3,12 @@ import argparse
 import requests
 import xmltodict
 
-from collector.database import insert_into_db
-
 # http://www.nationalrail.co.uk/100296.aspx
 # https://lite.realtime.nationalrail.co.uk/OpenLDBWS/
 # http://zetcode.com/db/sqlitepythontutorial/
 
 # create table departures (crs TEXT, platform TEXT, std TEXT, etd TEXT, origin TEXT, destination TEXT);
+from utils.database import insert_into_db
 
 xml_payload = """<?xml version="1.0"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://thalesgroup.com/RTTI/2014-02-20/ldb/" xmlns:ns2="http://thalesgroup.com/RTTI/2010-11-01/ldb/commontypes">

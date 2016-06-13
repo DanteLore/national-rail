@@ -1,14 +1,15 @@
 import argparse
+
 import requests
-import sqlite3
 import xmltodict
+
+from collector.database import insert_into_db
 
 # http://www.nationalrail.co.uk/100296.aspx
 # https://lite.realtime.nationalrail.co.uk/OpenLDBWS/
 # http://zetcode.com/db/sqlitepythontutorial/
 
 # create table departures (crs TEXT, platform TEXT, std TEXT, etd TEXT, origin TEXT, destination TEXT);
-
 
 xml_payload = """<?xml version="1.0"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://thalesgroup.com/RTTI/2014-02-20/ldb/" xmlns:ns2="http://thalesgroup.com/RTTI/2010-11-01/ldb/commontypes">
@@ -46,27 +47,12 @@ def fetch_trains(url, key, crs):
         }
 
 
-def insert_into_db(db, table, data):
-    connection = sqlite3.connect(db)
-
-    with connection:
-        cursor = connection.cursor()
-
-        cursor.execute("delete from {0}".format(table))
-        count = 0
-        for row in data:
-            sql = "insert into {0} ({1}) values({2});".format(table, ",".join(row), ",".join(map(lambda key: '"{0}"'.format(row[key]), row)))
-            cursor.execute(sql)
-            count += 1
-        print "Inserted {0} rows into '{1}':'{2}'".format(count, db, table)
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='National Rail Data Collector')
     parser.add_argument('--key', help='API Key', required=True)
     parser.add_argument('--url', help='API URL', default="http://lite.realtime.nationalrail.co.uk/OpenLDBWS/ldb6.asmx")
     parser.add_argument('--crs', help='CRS Station Code (default is Thatcham)', default="THA")
-    parser.add_argument('--db', help='SQLite DB Name', default="trains.db")
+    parser.add_argument('--db', help='SQLite DB Name', default="../data/trains.db")
     args = parser.parse_args()
 
     departures = fetch_trains(args.url, args.key, args.crs)

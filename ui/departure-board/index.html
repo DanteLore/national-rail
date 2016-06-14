@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Departures</title>
+    <link href="https://bootswatch.com/cyborg/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: led;
+            src: url(SIGNUS_LED-S.ttf);
+        }
+
+        .container-fluid {
+            max-width:1200px;
+        }
+        h1 {
+            font-weight: bold;
+            font-size: 7em;
+        }
+        h2 {
+            font-weight: bold;
+        }
+        .train {
+            font-family: led;
+            color: yellow;
+            font-size: 44pt;
+            wrap: nowrap;
+        }
+        .clock {
+            font-family: led;
+            color: yellow;
+            font-size: 60pt;
+            padding-top: 24px;
+            padding-right: 40px;
+            text-align: right;
+            wrap: nowrap;
+        }
+    </style>
+</head>
+<body ng-app="departuresApp" ng-controller="DeparturesController">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <h1>Departures</h1>
+            </div>
+            <div class="col-md-6 clock">
+                {{ clock }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Destination</h2>
+            </div>
+            <div class="col-md-2">
+                <h2>Plat</h2>
+            </div>
+            <div class="col-md-2">
+                <h2>Due</h2>
+            </div>
+            <div class="col-md-2">
+                <h2>Expt</h2>
+            </div>
+        </div>
+
+        <div class="row" ng-repeat="train in trains">
+            <div class="col-md-6 train">
+                {{ train.destination }}
+            </div>
+            <div class="col-md-2 train">
+                {{ train.platform }}
+            </div>
+            <div class="col-md-2 train">
+                {{ train.std }}
+            </div>
+            <div class="col-md-2 train">
+                {{ train.etd }}
+            </div>
+        </div>
+    </div>
+
+
+    <br/><br/><br/><br/><br/>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-route.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

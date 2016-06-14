@@ -42,7 +42,7 @@ def fetch_trains(url, key, crs):
             "destination": service["lt2:destination"]["lt2:location"]["lt2:locationName"],
             "std": service.get("lt2:std"),
             "etd": service.get("lt2:etd"),
-            "platform": service.get("lt2:platform", "?"),
+            "platform": service.get("lt2:platform", "-"),
         }
 
 

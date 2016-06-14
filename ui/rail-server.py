@@ -1,6 +1,6 @@
 import argparse
 import sqlite3
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 
 # http://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask
 
@@ -37,6 +37,9 @@ def index():
                     </head>
                     <body>
                         <h1>Real Time Train REST API</h1>
+                        <h2>UI</h2>
+                        <p>Departure board <a href="/departure-board">/departure-board</a></p>
+                        <h2>REST API</h2>
                         <p>To get a list of all departures in the DB, hit <a href="/departures">/departures</a></p>
                         <p>
                             Or you can hit /depratures/[CRS] with a station code (CRS) like
@@ -46,6 +49,16 @@ def index():
                     </body>
                 </html>
             """
+
+
+@app.route('/departure-board/')
+def index_html():
+    return send_from_directory('departure-board', 'index.html')
+
+
+@app.route('/departure-board/<path:path>')
+def static_files(path):
+    return send_from_directory('departure-board', path)
 
 
 @app.route('/departures')

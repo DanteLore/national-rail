@@ -12,7 +12,7 @@ def fetch_departures(table, crs=None):
 
     with connection:
         cursor = connection.cursor()
-        sql = "select crs, origin, destination, std, etd, platform from {0};".format(table)
+        sql = "select crs, origin, destination, std, etd, platform from {0} order by std asc;".format(table)
         if crs is not None:
             sql = sql.replace(";", " where crs = '{0}';").format(crs)
         cursor.execute(sql)

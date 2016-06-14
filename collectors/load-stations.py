@@ -2,7 +2,8 @@ import argparse
 
 from osgb import osgb_to_lonlat
 from osgb.convert import eastnorth_to_osgb
-from utils.database import insert_into_db
+from utils.database import insert_into_db, empty_table
+
 
 # Loads data from here: https://data.gov.uk/dataset/naptan
 
@@ -40,4 +41,5 @@ if __name__ == "__main__":
 
     rows = read_stations(args.filename)
     stations = map(convert, rows)
+    empty_table(args.db, "stations")
     insert_into_db(args.db, "stations", stations)

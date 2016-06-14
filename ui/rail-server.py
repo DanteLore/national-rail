@@ -7,14 +7,31 @@ from flask import Flask, jsonify, send_from_directory
 app = Flask(__name__)
 
 
+def read_calling_points(all_points):
+    points = []
+
+    for point_str in all_points.split("|"):
+        splits = point_str.split(",")
+        points.append({
+            "crs": splits[0],
+            "name": splits[1],
+            "st": splits[2],
+            "et": splits[3]
+        })
+
+    return points
+
+
 def fetch_departures(table, crs=None):
     connection = sqlite3.connect(db)
 
     with connection:
         cursor = connection.cursor()
-        sql = "select crs, origin, destination, std, etd, platform from {0} order by std asc;".format(table)
+        sql = "select crs, origin, destination, std, etd, platform, calling_points from {0};".format(table)
         if crs is not None:
-            sql = sql.replace(";", " where crs = '{0}';").format(crs)
+            sql = sql.replace(";", " where crs = '{0}';".format(crs))
+        sql = sql.replace(";", " order by std asc;")
+        print sql
         cursor.execute(sql)
         rows = cursor.fetchall()
 
@@ -24,7 +41,8 @@ def fetch_departures(table, crs=None):
         "destination": row[2],
         "std": row[3],
         "etd": row[4],
-        "platform": row[5]
+        "platform": row[5],
+        "calling_points": read_calling_points(row[6])
     }, rows)
 
 

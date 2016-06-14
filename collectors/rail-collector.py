@@ -43,8 +43,8 @@ def fetch_trains(url, key, crs):
         calling_points = map(lambda point: {
             "crs": point["lt4:crs"],
             "name": point["lt4:locationName"],
-            "st": point["lt4:st"],
-            "et": point["lt4:et"]
+            "st": point.get("lt4:st", "-"),
+            "et": point.get("lt4:et", "-")
         }, raw_points)
 
         cp_string = "|".join(

@@ -1,7 +1,18 @@
 var departuresApp = angular.module('departuresApp', ['ngRoute']);
 
 departuresApp
-	.controller('DeparturesController', function($scope, $http, $timeout) {
+    .config(function($routeProvider){
+	    $routeProvider
+		    .when('/:crs',
+		    {
+		    	controller: 'DeparturesController',
+			    templateUrl: 'board.html'
+		    })
+		    .otherwise({redirectTo: '/THA'});
+	})
+	.controller('DeparturesController', function($scope, $http, $timeout, $routeParams) {
+
+        $scope.crs = $routeParams.crs
 
         $scope.tick = function() {
             function checkTime(i) {
@@ -24,7 +35,7 @@ departuresApp
         }
 
         $scope.refreshTrains = function() {
-            $http.get("/departures").success(function(data) {
+            $http.get("/departures/" + $scope.crs).success(function(data) {
                 $scope.trains = data;
             });
 

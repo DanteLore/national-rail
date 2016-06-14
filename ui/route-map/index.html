@@ -1,38 +1,19 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="departuresApp">
+<html lang="en" ng-app="mapApp">
 <head>
-    <title>Departures</title>
+    <title>Route Map</title>
     <link href="https://bootswatch.com/cyborg/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
     <style>
-        @font-face {
-            font-family: led;
-            src: url(SIGNUS_LED-S.ttf);
-        }
-
         .container-fluid {
             max-width:1200px;
         }
-        h1 {
-            font-weight: bold;
-            font-size: 7em;
+        #mapid {
+            height: 600px;
+            border: 1px solid white;
         }
-        h2 {
-            font-weight: bold;
-        }
-        .train {
-            font-family: led;
-            color: yellow;
-            font-size: 44pt;
-            wrap: nowrap;
-        }
-        .clock {
-            font-family: led;
-            color: yellow;
-            font-size: 60pt;
-            padding-top: 24px;
-            padding-right: 40px;
-            text-align: right;
-            wrap: nowrap;
+        #mapid a {
+            color: black;
         }
     </style>
 </head>
@@ -42,6 +23,7 @@
 
     <br/><br/><br/><br/><br/>
 
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-route.js"></script>
     <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>

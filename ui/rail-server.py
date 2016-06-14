@@ -3,6 +3,7 @@ import sqlite3
 from flask import Flask, jsonify, send_from_directory
 
 # http://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask
+from werkzeug.utils import redirect
 
 app = Flask(__name__)
 
@@ -31,7 +32,6 @@ def fetch_departures(table, crs=None):
         if crs is not None:
             sql = sql.replace(";", " where crs = '{0}';".format(crs))
         sql = sql.replace(";", " order by std asc;")
-        print sql
         cursor.execute(sql)
         rows = cursor.fetchall()
 
@@ -43,6 +43,26 @@ def fetch_departures(table, crs=None):
         "etd": row[4],
         "platform": row[5],
         "calling_points": read_calling_points(row[6])
+    }, rows)
+
+
+def fetch_stations(table, crs=None):
+    connection = sqlite3.connect(db)
+
+    with connection:
+        cursor = connection.cursor()
+        sql = "select crs, name, latitude, longitude from {0};".format(table)
+        if crs is not None:
+            sql = sql.replace(";", " where crs = '{0}';".format(crs))
+        sql = sql.replace(";", " order by name asc;")
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+
+    return map(lambda row: {
+        "crs": row[0],
+        "name": row[1],
+        "latitude": row[2],
+        "longitude": row[3]
     }, rows)
 
 
@@ -69,14 +89,29 @@ def index():
             """
 
 
+@app.route('/route-map')
+def route_map_index_html():
+    return redirect("/route-map/index.html", code=302)
+
+
+@app.route('/route-map/<path:path>')
+def route_map_static_files(path):
+    return send_from_directory('route-map', path)
+
+
 @app.route('/departure-board/')
-def index_html():
-    return send_from_directory('departure-board', 'index.html')
+def departure_board_index_html():
+    return redirect("/departure-board/index.html", code=302)
 
 
 @app.route('/departure-board/<path:path>')
-def static_files(path):
+def departure_board_static_files(path):
     return send_from_directory('departure-board', path)
+
+
+@app.route('/stations')
+def stations():
+    return jsonify(fetch_stations("stations"))
 
 
 @app.route('/departures')

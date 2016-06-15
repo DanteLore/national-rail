@@ -24,19 +24,42 @@ mapApp
 
         CartoDB_DarkMatter.addTo(mymap);
 
-        $http.get("/routes/PAD").success(function(data) {
-            data.forEach(function(route){
-                route.forEach(function(station) {
-                    var location = [station.latitude, station.longitude]
+        var categoryScale = d3.scale.category10();
 
-                    L.circle(location, 50, {
-                        color: 'yellow',
-                        fillColor: 'yellow',
-                        fillOpacity: 0.5
+        $scope.doStation = function(data) {
+            data.forEach(function(route){
+                var color = categoryScale(route[0].crs)
+                var path = []
+
+                route.filter(function(x) {return x.latitude && x.longitude}).forEach(function(station) {
+                    var location = [station.latitude, station.longitude];
+                    path.push(location);
+
+                    L.circleMarker(location, {
+                        radius: 3,
+                        color: "black",
+                        weight: 1,
+                        stroke: true,
+                        fillColor: color,
+                        fillOpacity: 1
                     }).addTo(mymap);
 
                     //L.marker(location).addTo(mymap);
                 });
+
+                L.polyline(path, {
+                    weight: 2,
+                    color: color
+                }).addTo(mymap);
             });
-        });
+        };
+
+        $http.get("/routes/CHX").success($scope.doStation);
+        $http.get("/routes/MYB").success($scope.doStation);
+        $http.get("/routes/EUS").success($scope.doStation);
+        $http.get("/routes/STP").success($scope.doStation);
+        $http.get("/routes/WAT").success($scope.doStation);
+        $http.get("/routes/KGX").success($scope.doStation);
+        $http.get("/routes/LST").success($scope.doStation);
+        $http.get("/routes/PAD").success($scope.doStation);
     });

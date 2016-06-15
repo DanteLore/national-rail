@@ -28,6 +28,7 @@ xml_payload = """<?xml version="1.0"?>
 </SOAP-ENV:Envelope>
 """
 
+
 # url: The URL of the service
 # key: Your National Rail API key
 # crs: Station code (e.g. THA or PAD)
@@ -37,20 +38,28 @@ def fetch_trains(url, key, crs):
     response = requests.post(url, data=payload, headers=headers)
 
     data = xmltodict.parse(response.content)
-    services = data["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt5:trainServices"]["lt5:service"]
+    services = \
+        data["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"][
+            "lt5:trainServices"][
+            "lt5:service"]
 
     for service in services:
-        raw_points = service["lt5:subsequentCallingPoints"]["lt4:callingPointList"]["lt4:callingPoint"]
+        if "lt5:subsequentCallingPoints" not in service:
+            raw_points = []
+        else:
+            raw_points = service["lt5:subsequentCallingPoints"]["lt4:callingPointList"]["lt4:callingPoint"]
 
+        filtered_points = filter(lambda point: "lt4:crs" in point and "lt4:locationName" in point, raw_points)
         calling_points = map(lambda point: {
             "crs": point["lt4:crs"],
             "name": point["lt4:locationName"],
             "st": point.get("lt4:st", "-"),
             "et": point.get("lt4:et", "-")
-        }, raw_points)
+        }, filtered_points)
 
         cp_string = "|".join(
-                map(lambda p: "{0},{1},{2},{3}".format(p["crs"], p["name"], p["st"], p["et"]), calling_points)
+                map(lambda p: "{0},{1},{2},{3}".format(p["crs"], p["name"], p["st"], p["et"]),
+                    calling_points)
         )
 
         yield {
@@ -72,8 +81,13 @@ if __name__ == "__main__":
     parser.add_argument('--db', help='SQLite DB Name', default="../data/trains.db")
     args = parser.parse_args()
 
+    crs_list = args.crs.split(",")
+
     while True:
-        departures = fetch_trains(args.url, args.key, args.crs)
-        delete_where(args.db, "departures", "crs == '{0}'".format(args.crs))
-        insert_into_db(args.db, "departures", departures)
+        for crs in crs_list:
+            print "Processing station '{0}'".format(crs)
+            departures = fetch_trains(args.url, args.key, crs)
+            delete_where(args.db, "departures", "crs == '{0}'".format(crs))
+            insert_into_db(args.db, "departures", departures)
+            sleep(1)
         sleep(10)

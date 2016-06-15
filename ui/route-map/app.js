@@ -24,19 +24,19 @@ mapApp
 
         CartoDB_DarkMatter.addTo(mymap);
 
-        $http.get("/stations").success(function(data) {
-            $scope.stations = data;
+        $http.get("/routes/PAD").success(function(data) {
+            data.forEach(function(route){
+                route.forEach(function(station) {
+                    var location = [station.latitude, station.longitude]
 
-            $scope.stations.forEach(function(station){
-                var location = [station.latitude, station.longitude]
+                    L.circle(location, 50, {
+                        color: 'yellow',
+                        fillColor: 'yellow',
+                        fillOpacity: 0.5
+                    }).addTo(mymap);
 
-                L.circle(location, 50, {
-                    color: 'yellow',
-                    fillColor: 'yellow',
-                    fillOpacity: 0.5
-                }).addTo(mymap);
-
-                //L.marker(location).addTo(mymap);
+                    //L.marker(location).addTo(mymap);
+                });
             });
         });
     });

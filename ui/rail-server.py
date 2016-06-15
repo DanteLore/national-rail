@@ -85,9 +85,8 @@ def service_to_route(service):
     }
 
     route = service["calling_points"]
-    route.append(crs_point)
+    route.insert(0, crs_point)
     route = map(add_location, route)
-    route = sorted(route, key=lambda x: x["st"])
     return route
 
 

@@ -2,6 +2,8 @@ var mapApp = angular.module('mapApp', ['ngRoute']);
 
 // Map tiles from: http://leaflet-extras.github.io/leaflet-providers/preview/index.html CartoDB.DarkMatter
 
+// _Awesome_ snake from: https://github.com/IvanSanchez/Leaflet.Polyline.SnakeAnim
+
 mapApp
     .config(function($routeProvider){
 	    $routeProvider
@@ -24,6 +26,9 @@ mapApp
 
         CartoDB_DarkMatter.addTo(mymap);
 
+        $scope.routeLayer = L.featureGroup()
+            .addTo(mymap);
+
         var categoryScale = d3.scale.category10();
 
         $scope.doStation = function(data) {
@@ -34,7 +39,7 @@ mapApp
                 route.filter(function(x) {return x.latitude && x.longitude}).forEach(function(station) {
                     var location = [station.latitude, station.longitude];
                     path.push(location);
-
+                    /*
                     L.circleMarker(location, {
                         radius: 3,
                         color: "black",
@@ -42,24 +47,36 @@ mapApp
                         stroke: true,
                         fillColor: color,
                         fillOpacity: 1
-                    }).addTo(mymap);
-
-                    //L.marker(location).addTo(mymap);
+                    }).addTo($scope.routeLayer);
+                    */
                 });
 
-                L.polyline(path, {
-                    weight: 2,
-                    color: color
-                }).addTo(mymap);
+                var line = L.polyline(path, {
+                    weight: 4,
+                    color: color,
+                    opacity: 0.5
+                }).addTo($scope.routeLayer);
+
+                line.snakeIn();
             });
         };
 
-        $http.get("/routes/CHX").success($scope.doStation);
-        $http.get("/routes/MYB").success($scope.doStation);
-        $http.get("/routes/EUS").success($scope.doStation);
-        $http.get("/routes/STP").success($scope.doStation);
-        $http.get("/routes/WAT").success($scope.doStation);
-        $http.get("/routes/KGX").success($scope.doStation);
-        $http.get("/routes/LST").success($scope.doStation);
-        $http.get("/routes/PAD").success($scope.doStation);
+        $scope.refresh = function() {
+            $scope.routeLayer.clearLayers();
+
+            $http.get("/routes/CHX").success($scope.doStation);
+            $http.get("/routes/MYB").success($scope.doStation);
+            $http.get("/routes/EUS").success($scope.doStation);
+            $http.get("/routes/STP").success($scope.doStation);
+            $http.get("/routes/WAT").success($scope.doStation);
+            $http.get("/routes/KGX").success($scope.doStation);
+            $http.get("/routes/LST").success($scope.doStation);
+            $http.get("/routes/PAD").success($scope.doStation);
+
+            $timeout(function(){
+                $scope.refresh();
+            }, 10000)
+        };
+
+        $scope.refresh();
     });

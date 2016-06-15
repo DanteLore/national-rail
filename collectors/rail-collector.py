@@ -28,7 +28,9 @@ xml_payload = """<?xml version="1.0"?>
 </SOAP-ENV:Envelope>
 """
 
-
+# url: The URL of the service
+# key: Your National Rail API key
+# crs: Station code (e.g. THA or PAD)
 def fetch_trains(url, key, crs):
     headers = {'content-type': 'text/xml'}
     payload = xml_payload.replace("{KEY}", key).replace("{CRS}", crs)

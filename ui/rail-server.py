@@ -23,12 +23,12 @@ def read_calling_points(all_points):
     return points
 
 
-def fetch_departures(table, crs=None):
+def fetch_departures(crs=None):
     connection = sqlite3.connect(db)
 
     with connection:
         cursor = connection.cursor()
-        sql = "select crs, origin, destination, std, etd, platform, calling_points from {0};".format(table)
+        sql = "select crs, origin, destination, std, etd, platform, calling_points from {0};".format("departures")
         if crs is not None:
             sql = sql.replace(";", " where crs = '{0}';".format(crs))
         sql = sql.replace(";", " order by std asc;")
@@ -46,12 +46,63 @@ def fetch_departures(table, crs=None):
     }, rows)
 
 
-def fetch_stations(table, crs=None):
+def crs_to_name(crs):
     connection = sqlite3.connect(db)
 
     with connection:
         cursor = connection.cursor()
-        sql = "select crs, name, latitude, longitude from {0};".format(table)
+        cursor.execute("select name from stations where crs = '{0}'".format(crs))
+        rows = cursor.fetchall()
+        return rows[0][0]
+
+
+def get_location(crs):
+    connection = sqlite3.connect(db)
+
+    with connection:
+        cursor = connection.cursor()
+        cursor.execute("select latitude, longitude from stations where crs = '{0}'".format(crs))
+        rows = cursor.fetchall()
+        if len(rows) >= 1:
+            return rows[0][0], rows[0][1]
+        else:
+            return None, None
+
+
+def add_location(station):
+    lat, lon = get_location(station["crs"])
+    station["latitude"] = lat
+    station["longitude"] = lon
+    return station
+
+
+def service_to_route(service):
+    crs_point = {
+        "crs": service["crs"],
+        "name": crs_to_name(service["crs"]),
+        "st": service.get("std", "-"),
+        "et": service.get("etd", "-")
+    }
+
+    route = service["calling_points"]
+    route.append(crs_point)
+    route = map(add_location, route)
+    route = sorted(route, key=lambda x: x["st"])
+    return route
+
+
+def fetch_routes_for(crs=None):
+    departures = fetch_departures(crs)
+    routes = map(service_to_route, departures)
+    return routes
+
+
+def fetch_stations(crs=None):
+    connection = sqlite3.connect(db)
+
+    with connection:
+        cursor = connection.cursor()
+        sql = "select crs, name, latitude, longitude from {0};".format("stations")
         if crs is not None:
             sql = sql.replace(";", " where crs = '{0}';".format(crs))
         sql = sql.replace(";", " order by name asc;")
@@ -111,17 +162,22 @@ def departure_board_static_files(path):
 
 @app.route('/stations')
 def stations():
-    return jsonify(fetch_stations("stations"))
+    return jsonify(fetch_stations())
 
 
 @app.route('/departures')
 def departures():
-    return jsonify(fetch_departures("departures"))
+    return jsonify(fetch_departures())
 
 
 @app.route('/departures/<string:crs>')
 def departures_for(crs):
-    return jsonify(fetch_departures("departures", crs))
+    return jsonify(fetch_departures(crs))
+
+
+@app.route('/routes/<string:crs>')
+def routes_for(crs):
+    return jsonify(fetch_routes_for(crs))
 
 
 if __name__ == '__main__':

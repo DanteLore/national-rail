@@ -22,33 +22,21 @@ mapApp
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
             subdomains: 'abcd',
             maxZoom: 19
-        });
-
-        CartoDB_DarkMatter.addTo(mymap);
+        }).addTo(mymap);
 
         $scope.routeLayer = L.featureGroup()
             .addTo(mymap);
 
-        var categoryScale = d3.scale.category10();
+        $scope.categoryScale = d3.scale.category10();
 
         $scope.doStation = function(data) {
             data.forEach(function(route){
-                var color = categoryScale(route[0].crs)
-                var path = []
+                var color = $scope.categoryScale(route[0].crs)
+                var path = Array()
 
                 route.filter(function(x) {return x.latitude && x.longitude}).forEach(function(station) {
                     var location = [station.latitude, station.longitude];
                     path.push(location);
-                    /*
-                    L.circleMarker(location, {
-                        radius: 3,
-                        color: "black",
-                        weight: 1,
-                        stroke: true,
-                        fillColor: color,
-                        fillOpacity: 1
-                    }).addTo($scope.routeLayer);
-                    */
                 });
 
                 var line = L.polyline(path, {
@@ -57,26 +45,31 @@ mapApp
                     opacity: 0.5
                 }).addTo($scope.routeLayer);
 
-                line.snakeIn();
+                try {
+                    if(path.length > 1)
+                        line.snakeIn();
+                }
+                catch (e) {
+                    console.log("Error: " + path)
+                }
             });
         };
 
         $scope.refresh = function() {
             $scope.routeLayer.clearLayers();
 
-            $http.get("/routes/CHX").success($scope.doStation);
-            $http.get("/routes/MYB").success($scope.doStation);
-            $http.get("/routes/EUS").success($scope.doStation);
-            $http.get("/routes/STP").success($scope.doStation);
-            $http.get("/routes/WAT").success($scope.doStation);
-            $http.get("/routes/KGX").success($scope.doStation);
-            $http.get("/routes/LST").success($scope.doStation);
-            $http.get("/routes/PAD").success($scope.doStation);
+            $scope.crsList.forEach(function(crs) {
+                $http.get("/routes/" + crs).success($scope.doStation);
+            });
 
             $timeout(function(){
                 $scope.refresh();
             }, 10000)
         };
 
-        $scope.refresh();
+        $http.get("/loaded-crs").success(function(crsData) {
+            $scope.crsList = crsData;
+
+            $scope.refresh();
+        })
     });

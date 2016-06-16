@@ -60,6 +60,16 @@ def crs_to_name(crs):
         return rows[0][0]
 
 
+def distinct_crs():
+    connection = sqlite3.connect(db)
+
+    with connection:
+        cursor = connection.cursor()
+        cursor.execute("select distinct crs from departures")
+        rows = cursor.fetchall()
+        return map(lambda row: row[0], rows)
+
+
 def get_location(crs):
     connection = sqlite3.connect(db)
 
@@ -91,12 +101,13 @@ def service_to_route(service):
     route = service["calling_points"]
     route.insert(0, crs_point)
     route = map(add_location, route)
+    route = filter(lambda x: x["latitude"] is not None and x["longitude"] is not None, route)
     return route
 
 
 def fetch_routes_for(crs=None):
-    departures = fetch_departures(crs)
-    routes = map(service_to_route, departures)
+    dep = fetch_departures(crs)
+    routes = map(service_to_route, dep)
     return routes
 
 
@@ -161,6 +172,11 @@ def departure_board_index_html():
 @app.route('/departure-board/<path:path>')
 def departure_board_static_files(path):
     return send_from_directory('departure-board', path)
+
+
+@app.route('/loaded-crs')
+def crs():
+    return jsonify(distinct_crs())
 
 
 @app.route('/stations')

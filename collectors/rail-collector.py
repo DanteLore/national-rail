@@ -85,9 +85,13 @@ if __name__ == "__main__":
 
     while True:
         for crs in crs_list:
-            print "Processing station '{0}'".format(crs)
-            departures = fetch_trains(args.url, args.key, crs)
-            delete_where(args.db, "departures", "crs == '{0}'".format(crs))
-            insert_into_db(args.db, "departures", departures)
-            sleep(1)
+            try:
+                print "Processing station '{0}'".format(crs)
+                departures = fetch_trains(args.url, args.key, crs)
+                delete_where(args.db, "departures", "crs == '{0}'".format(crs))
+                insert_into_db(args.db, "departures", departures)
+                sleep(1)
+            except:
+                print "Error"
+
         sleep(10)

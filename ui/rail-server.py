@@ -12,7 +12,11 @@ def read_calling_points(all_points):
     points = []
 
     for point_str in all_points.split("|"):
-        splits = point_str.split(",")
+        splits = point_str.strip().split(",")
+
+        if len(splits) != 4:
+            continue
+
         points.append({
             "crs": splits[0],
             "name": splits[1],

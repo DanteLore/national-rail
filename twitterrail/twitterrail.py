@@ -20,7 +20,7 @@ class RailTweeter:
         services = list(self.queries.services_between(self.origin, self.destination))
 
         self.tweet_digest(services)
-        # self.tweeter.message("DanteLore", "Yo yo")
+        self.direct_messages(services)
 
     @staticmethod
     def get_emoji(ser):
@@ -62,6 +62,17 @@ class RailTweeter:
         print message
         self.tweeter.tweet(message)
 
+    def direct_messages(self, services):
+        cancellations = filter(lambda x: x["etd"].lower() == "cancelled", services)
+        for service in cancellations:
+            message = "{0} {1} from {2} to {3} has been cancelled".format(
+                emoji_skull,
+                service["std"],
+                service["origin"],
+                service["destination"]
+            )
+            self.tweeter.message("DanteLore", message)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Tweeting about railways')
@@ -75,5 +86,5 @@ if __name__ == "__main__":
 
     twitter = RealTweeterApi(args.consumer_key, args.consumer_secret, args.access_token, args.access_token_secret)
     queries = RealQueries(args.url, args.rail_key)
-    rt = RailTweeter(twitter, queries, origin="PAD", destination="RDG")
+    rt = RailTweeter(twitter, queries, origin="PAD", destination="THA")
     rt.do_it()

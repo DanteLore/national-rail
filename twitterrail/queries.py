@@ -40,17 +40,20 @@ class RealQueries:
         response = requests.post(self.url, data=xml, headers=self.headers)
 
         data = xmltodict.parse(response.content)
-        services = \
-            data["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"][
-                "lt5:trainServices"][
-                "lt5:service"]
+        response = data["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]
 
-        for service in services:
-            yield {
-                "crs": origin,
-                "origin": service["lt5:origin"]["lt4:location"]["lt4:locationName"],
-                "destination": service["lt5:destination"]["lt4:location"]["lt4:locationName"],
-                "std": service.get("lt4:std"),
-                "etd": service.get("lt4:etd"),
-                "platform": service.get("lt4:platform", "-")
-            }
+        if "lt5:trainServices" in response:
+            services = response["lt5:trainServices"]["lt5:service"]
+
+            if type(services) is not list:
+                services = [services]
+
+            for service in services:
+                yield {
+                    "crs": origin,
+                    "origin": service["lt5:origin"]["lt4:location"]["lt4:locationName"],
+                    "destination": service["lt5:destination"]["lt4:location"]["lt4:locationName"],
+                    "std": service.get("lt4:std"),
+                    "etd": service.get("lt4:etd"),
+                    "platform": service.get("lt4:platform", "-")
+                }

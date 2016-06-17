@@ -39,9 +39,10 @@ def fetch_trains(url, key, crs):
 
     data = xmltodict.parse(response.content)
     services = \
-        data["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"][
-            "lt5:trainServices"][
-            "lt5:service"]
+        data["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt5:trainServices"]["lt5:service"]
+
+    if type(services) is not list:
+        services = [services]
 
     for service in services:
         if "lt5:subsequentCallingPoints" not in service:

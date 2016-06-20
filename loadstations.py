@@ -2,12 +2,10 @@ import argparse
 
 from osgb import osgb_to_lonlat
 from osgb.convert import eastnorth_to_osgb
-from utils.database import insert_into_db, empty_table
+from utils.database import insert_into_db, empty_table, execute_sql
 
 
 # Loads data from here: https://data.gov.uk/dataset/naptan
-
-# create table stations (crs TEXT, name TEXT, easting INT, northing INT, latitude DOUBLE, longitude DOUBLE);
 
 
 def read_stations(filename):
@@ -38,6 +36,8 @@ if __name__ == "__main__":
     parser.add_argument('--filename', help='Input CSV file', default="data/RailReferences.csv")
     parser.add_argument('--db', help='SQLite DB Name', default="data/trains.db")
     args = parser.parse_args()
+
+    execute_sql(args.db, "create table if not exists stations (crs TEXT, name TEXT, easting INT, northing INT, latitude DOUBLE, longitude DOUBLE);")
 
     rows = read_stations(args.filename)
     stations = map(convert, rows)

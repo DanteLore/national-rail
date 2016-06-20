@@ -26,6 +26,16 @@ def empty_table(db, table):
     print "Cleared table '{0}':'{1}'".format(db, table)
 
 
+def execute_sql(db, sql):
+    connection = sqlite3.connect(db)
+
+    with connection:
+        cursor = connection.cursor()
+        cursor.execute(sql)
+
+    print "Executed command '{0}':'{1}'".format(db, sql)
+
+
 def delete_where(db, table, condition):
     connection = sqlite3.connect(db)
 

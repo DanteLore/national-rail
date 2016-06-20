@@ -8,8 +8,7 @@ import xmltodict
 # https://lite.realtime.nationalrail.co.uk/OpenLDBWS/
 # http://zetcode.com/db/sqlitepythontutorial/
 
-# create table departures (crs TEXT, platform TEXT, std TEXT, etd TEXT, origin TEXT, destination TEXT, calling_points TEXT);
-from utils.database import insert_into_db, delete_where
+from utils.database import insert_into_db, delete_where, execute_sql
 
 xml_payload = """<?xml version="1.0"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://thalesgroup.com/RTTI/2016-02-16/ldb/" xmlns:ns2="http://thalesgroup.com/RTTI/2013-11-28/Token/types">
@@ -81,6 +80,8 @@ if __name__ == "__main__":
     parser.add_argument('--crs', help='CRS Station Code (default is Thatcham)', default="THA")
     parser.add_argument('--db', help='SQLite DB Name', default="data/trains.db")
     args = parser.parse_args()
+
+    execute_sql(args.db, "create table if not exists departures (crs TEXT, platform TEXT, std TEXT, etd TEXT, origin TEXT, destination TEXT, calling_points TEXT);")
 
     crs_list = args.crs.split(",")
 

@@ -156,22 +156,22 @@ def index():
 
 @app.route('/route-map')
 def route_map_index_html():
-    return redirect("/route-map/index.html", code=302)
+    return redirect("ui/route-map/index.html", code=302)
 
 
 @app.route('/route-map/<path:path>')
 def route_map_static_files(path):
-    return send_from_directory('route-map', path)
+    return send_from_directory('ui/route-map', path)
 
 
 @app.route('/departure-board/')
 def departure_board_index_html():
-    return redirect("/departure-board/index.html", code=302)
+    return redirect("ui//departure-board/index.html", code=302)
 
 
 @app.route('/departure-board/<path:path>')
 def departure_board_static_files(path):
-    return send_from_directory('departure-board', path)
+    return send_from_directory('ui/departure-board', path)
 
 
 @app.route('/loaded-crs')
@@ -201,7 +201,7 @@ def routes_for(crs):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='National Rail Data REST Server')
-    parser.add_argument('--db', help='SQLite DB Name', default="../data/trains.db")
+    parser.add_argument('--db', help='SQLite DB Name', default="data/trains.db")
     args = parser.parse_args()
 
     db = args.db

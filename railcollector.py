@@ -79,7 +79,7 @@ if __name__ == "__main__":
     parser.add_argument('--key', help='API Key', required=True)
     parser.add_argument('--url', help='API URL', default="http://lite.realtime.nationalrail.co.uk/OpenLDBWS/ldb9.asmx")
     parser.add_argument('--crs', help='CRS Station Code (default is Thatcham)', default="THA")
-    parser.add_argument('--db', help='SQLite DB Name', default="../data/trains.db")
+    parser.add_argument('--db', help='SQLite DB Name', default="data/trains.db")
     args = parser.parse_args()
 
     crs_list = args.crs.split(",")

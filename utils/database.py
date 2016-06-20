@@ -23,7 +23,7 @@ def empty_table(db, table):
         cursor = connection.cursor()
         cursor.execute("delete from {0}".format(table))
 
-    print "Cleared table '{1}':'{2}'".format(db, table)
+    print "Cleared table '{0}':'{1}'".format(db, table)
 
 
 def delete_where(db, table, condition):

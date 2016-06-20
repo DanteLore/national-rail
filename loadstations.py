@@ -35,8 +35,8 @@ def convert(row):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='National Rail Data Collector')
-    parser.add_argument('--filename', help='Input CSV file', default="../data/RailReferences.csv")
-    parser.add_argument('--db', help='SQLite DB Name', default="../data/trains.db")
+    parser.add_argument('--filename', help='Input CSV file', default="data/RailReferences.csv")
+    parser.add_argument('--db', help='SQLite DB Name', default="data/trains.db")
     args = parser.parse_args()
 
     rows = read_stations(args.filename)

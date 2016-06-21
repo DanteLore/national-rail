@@ -35,7 +35,8 @@ departuresApp
         }
 
         $scope.refreshTrains = function() {
-            $http.get("/departures/" + $scope.crs).success(function(data) {
+            // Nasty hack to get round IE's tendency to cache the page!
+            $http.get("/departures/" + $scope.crs + "?" + new Date().getTime()).success(function(data) {
                 $scope.trains = data;
             });
 

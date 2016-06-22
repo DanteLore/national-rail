@@ -1,7 +1,4 @@
-import argparse
 from datetime import datetime
-from tweeting import RealTweeterApi
-from queries import RealQueries
 
 emoji_skull = "\xF0\x9F\x92\x80"
 emoji_tick = "\xE2\x9C\x94"
@@ -123,21 +120,10 @@ class RailTweeter:
 
     def send_dm(self, message):
         for user in self.users:
-            self.tweeter.message(user, message)
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Tweeting about railways')
-    parser.add_argument('--rail-key', help='API Key', required=True)
-    parser.add_argument('--consumer-key', help='Consumer Key', required=True)
-    parser.add_argument('--consumer-secret', help='Consumer Secret', required=True)
-    parser.add_argument('--access-token', help='Access Token', required=True)
-    parser.add_argument('--access-token-secret', help='Access Token Secret', required=True)
-    parser.add_argument('--url', help='API URL', default="http://lite.realtime.nationalrail.co.uk/OpenLDBWS/ldb9.asmx")
-    parser.add_argument('--users', help='Users to DM (comma separated)', default="ThatchamTrains")
-    args = parser.parse_args()
-
-    twitter = RealTweeterApi(args.consumer_key, args.consumer_secret, args.access_token, args.access_token_secret)
-    queries = RealQueries(args.url, args.rail_key)
-    rt = RailTweeter(twitter, queries, home="THA", work="PAD", users=args.users)
-    rt.do_it(datetime.now())
+            previous = filter(
+                    lambda msg: msg["message"] == message and
+                                (datetime.now() - msg["timestamp"]).days < 1,
+                    self.tweeter.messages_sent_to(user)
+            )
+            if len(previous) == 0:
+                self.tweeter.message(user, message)

@@ -4,11 +4,29 @@ from freezegun import freeze_time
 from datetime import datetime
 from queries import MockQueries
 from tweeting import MockTweeterApi
-from twitterrail import RailTweeter, emoji_cross, emoji_tick, emoji_train, emoji_late, emoji_skull
+from twitterrail.railtweeter import RailTweeter, emoji_cross, emoji_tick, emoji_train, emoji_late, emoji_skull
 
 
 class TweetRailTests(unittest.TestCase):
     # Test the direct messaging service
+    def test_do_not_duplicate_messages(self):
+        tweeter = MockTweeterApi()
+        queries = MockQueries(services=[
+            {'origin': 'London Paddington', 'destination': u'Bedwyn', 'platform': '-', 'std': u'11:18',
+             'etd': u'Cancelled'}
+        ])
+        rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
+        rt.do_it(datetime.now())
+        rt.do_it(datetime.now())
+        rt.do_it(datetime.now())
+        self.assertEqual(len(tweeter.messages), 1)
+        assert {
+                   "user": "Fred",
+                   "timestamp": datetime.now(),
+                   "message": "{0} 11:18 from London Paddington to Bedwyn has been cancelled".format(emoji_skull)
+               } in tweeter.messages
+
+
     def test_dm_goes_to_correct_users(self):
         tweeter = MockTweeterApi()
         queries = MockQueries(services=[
@@ -20,10 +38,12 @@ class TweetRailTests(unittest.TestCase):
         self.assertEqual(len(tweeter.messages), 2)
         assert {
                    "user": "Bob",
+                   "timestamp": datetime.now(),
                    "message": "{0} 11:18 from London Paddington to Bedwyn has been cancelled".format(emoji_skull)
                } in tweeter.messages
         assert {
                    "user": "Geoff",
+                   "timestamp": datetime.now(),
                    "message": "{0} 11:18 from London Paddington to Bedwyn has been cancelled".format(emoji_skull)
                } in tweeter.messages
 
@@ -39,6 +59,7 @@ class TweetRailTests(unittest.TestCase):
         self.assertEqual(len(tweeter.messages), 1)
         assert {
                    "user": "Fred",
+                   "timestamp": datetime.now(),
                    "message": "{0} 11:18 from London Paddington to Bedwyn has been cancelled".format(emoji_skull)
                } in tweeter.messages
 
@@ -54,6 +75,7 @@ class TweetRailTests(unittest.TestCase):
         self.assertEqual(len(tweeter.messages), 1)
         assert {
                    "user": "Fred",
+                   "timestamp": datetime.now(),
                    "message": "{0} 11:18 from London Paddington to Bedwyn delayed expected 11:45".format(emoji_late)
                } in tweeter.messages
 

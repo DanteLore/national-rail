@@ -1,5 +1,6 @@
-from twitter import Twitter, OAuth
+from twitter import Twitter, OAuth, TwitterHTTPError
 from datetime import datetime
+
 
 class MockTweeterApi:
     def __init__(self):
@@ -20,20 +21,26 @@ class MockTweeterApi:
 class RealTweeterApi:
     def __init__(self, consumer_key, consumer_secret, access_token, access_token_secret):
         self.twitter = Twitter(
-            auth=OAuth(access_token, access_token_secret, consumer_key, consumer_secret)
+                auth=OAuth(access_token, access_token_secret, consumer_key, consumer_secret)
         )
 
     def tweet(self, message):
-        self.twitter.statuses.update(status=message)
+        try:
+            self.twitter.statuses.update(status=message)
+        except TwitterHTTPError as e:
+            print e.message
 
     def messages_sent_to(self, user):
         dms = map(lambda msg: {
             "user": msg["recipient"]["screen_name"],
             "timestamp": datetime.strptime(msg["created_at"], '%a %b %d %H:%M:%S +0000 %Y'),
-            "message": msg["text"]
+            "message": msg["text"].encode('utf-8')
         }, self.twitter.direct_messages.sent(count=100, include_rts=1))
         user_messages = filter(lambda msg: msg["user"] == user, dms)
         return user_messages
 
     def message(self, user, message):
-        self.twitter.direct_messages.new(user=user, text=message)
+        try:
+            self.twitter.direct_messages.new(user=user, text=message)
+        except TwitterHTTPError as e:
+            print e.message

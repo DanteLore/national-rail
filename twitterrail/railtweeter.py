@@ -15,7 +15,8 @@ class RailTweeter:
         self.work = work
         self.users = users.split(",")
 
-    def do_it(self, now):
+    def do_it(self):
+        now = datetime.now()
         if now.hour < 12:
             origin = self.home
             destination = self.work
@@ -25,8 +26,8 @@ class RailTweeter:
 
         services = list(self.queries.services_between(origin, destination))
 
-        self.tweet_digest(services, origin, destination)
         self.direct_messages(services, now)
+        self.tweet_digest(services, origin, destination)
 
     @staticmethod
     def get_emoji(ser):
@@ -120,10 +121,14 @@ class RailTweeter:
 
     def send_dm(self, message):
         for user in self.users:
+            sent_messages = self.tweeter.messages_sent_to(user)
             previous = filter(
                     lambda msg: msg["message"] == message and
                                 (datetime.now() - msg["timestamp"]).days < 1,
-                    self.tweeter.messages_sent_to(user)
+                    sent_messages
             )
-            if len(previous) == 0:
+            if len(previous) > 0:
+                print "Identical message sent to {0} already today".format(user)
+            else:
+                print "Messaging {0}".format(user)
                 self.tweeter.message(user, message)

@@ -16,9 +16,9 @@ class TweetRailTests(unittest.TestCase):
              'etd': u'Cancelled'}
         ])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
-        rt.do_it(datetime.now())
-        rt.do_it(datetime.now())
-        rt.do_it(datetime.now())
+        rt.do_it()
+        rt.do_it()
+        rt.do_it()
         self.assertEqual(len(tweeter.messages), 1)
         assert {
                    "user": "Fred",
@@ -34,7 +34,7 @@ class TweetRailTests(unittest.TestCase):
              'etd': u'Cancelled'}
         ])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Bob,Geoff")
-        rt.do_it(datetime.now())
+        rt.do_it()
         self.assertEqual(len(tweeter.messages), 2)
         assert {
                    "user": "Bob",
@@ -55,7 +55,7 @@ class TweetRailTests(unittest.TestCase):
              'etd': u'Cancelled'}
         ])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
-        rt.do_it(datetime.now())
+        rt.do_it()
         self.assertEqual(len(tweeter.messages), 1)
         assert {
                    "user": "Fred",
@@ -71,7 +71,7 @@ class TweetRailTests(unittest.TestCase):
              'etd': u'11:45'}
         ])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
-        rt.do_it(datetime.now())
+        rt.do_it()
         self.assertEqual(len(tweeter.messages), 1)
         assert {
                    "user": "Fred",
@@ -87,7 +87,7 @@ class TweetRailTests(unittest.TestCase):
              'etd': u'17:22'}
         ])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
-        rt.do_it(datetime.now())
+        rt.do_it()
         self.assertEqual(len(tweeter.messages), 0)
 
     @freeze_time("2016-06-18 17:00:00")
@@ -98,7 +98,7 @@ class TweetRailTests(unittest.TestCase):
              'etd': u'Cancelled'}
         ])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
-        rt.do_it(datetime.now())
+        rt.do_it()
         self.assertEqual(len(tweeter.messages), 0)
 
     @freeze_time("2016-06-17 06:00:00", tz_offset=-1)
@@ -109,7 +109,7 @@ class TweetRailTests(unittest.TestCase):
              'etd': u'Cancelled'}
         ])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
-        rt.do_it(datetime.now())
+        rt.do_it()
         self.assertEqual(len(tweeter.messages), 0)
 
     @freeze_time("2016-06-17 22:00:00")
@@ -120,7 +120,7 @@ class TweetRailTests(unittest.TestCase):
              'etd': u'Cancelled'}
         ])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
-        rt.do_it(datetime.now())
+        rt.do_it()
         self.assertEqual(len(tweeter.messages), 0)
 
     @freeze_time("2016-01-01 07:00:00")
@@ -131,7 +131,7 @@ class TweetRailTests(unittest.TestCase):
              'etd': u'On time'}
         ])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
-        rt.do_it(datetime.now())
+        rt.do_it()
         self.assertEqual(len(tweeter.messages), 0)
 
     # Test the "Twitter Digest"
@@ -140,7 +140,7 @@ class TweetRailTests(unittest.TestCase):
         tweeter = MockTweeterApi()
         queries = MockQueries(services=[])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
-        rt.do_it(datetime.now())
+        rt.do_it()
         tweet = tweeter.tweets[0]
         assert "{0} PAD - THA".format(emoji_train) in tweet
         assert "No services" in tweet
@@ -153,7 +153,7 @@ class TweetRailTests(unittest.TestCase):
              'etd': u'On time'}
         ])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
-        rt.do_it(datetime.now())
+        rt.do_it()
         tweet = tweeter.tweets[0]
         assert "{0} PAD - THA".format(emoji_train) in tweet
         assert "{0} 11:18 Bedwyn".format(emoji_tick) in tweet
@@ -168,7 +168,7 @@ class TweetRailTests(unittest.TestCase):
              'etd': u'On time'}
         ])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
-        rt.do_it(datetime.now())
+        rt.do_it()
         tweet = tweeter.tweets[0]
         assert "{0} PAD - THA".format(emoji_train) in tweet
         assert "{0} 11:18 Bedwyn".format(emoji_cross) in tweet
@@ -181,7 +181,7 @@ class TweetRailTests(unittest.TestCase):
             {'origin': 'London Paddington', 'destination': u'Bedwyn', 'platform': '-', 'std': u'11:18', 'etd': u'11:24'}
         ])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
-        rt.do_it(datetime.now())
+        rt.do_it()
         tweet = tweeter.tweets[0]
         self.assertTrue("{0} PAD - THA".format(emoji_train) in tweet)
         self.assertTrue("{0} 11:18 Bedwyn 11:24".format(emoji_late) in tweet)
@@ -194,7 +194,7 @@ class TweetRailTests(unittest.TestCase):
              'std': u'11:18', 'etd': u'On time'}
         ])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
-        rt.do_it(datetime.now())
+        rt.do_it()
         tweet = tweeter.tweets[0]
         self.assertTrue("{0} PAD - THA".format(emoji_train) in tweet)
         self.assertTrue("{0} 11:18 This is a".format(emoji_tick) in tweet)
@@ -217,7 +217,7 @@ class TweetRailTests(unittest.TestCase):
              'etd': u'On time'}
         ])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
-        rt.do_it(datetime.now())
+        rt.do_it()
         tweet = tweeter.tweets[0]
         self.assertTrue("{0} PAD - THA".format(emoji_train) in tweet)
         self.assertFalse("06:18" in tweet)
@@ -227,7 +227,7 @@ class TweetRailTests(unittest.TestCase):
         tweeter = MockTweeterApi()
         queries = MockQueries(services=[])
         rt = RailTweeter(tweeter, queries, "THA", "PAD", "Fred")
-        rt.do_it(datetime.now())
+        rt.do_it()
         tweet = tweeter.tweets[0]
         assert "{0} THA - PAD".format(emoji_train) in tweet
 
@@ -236,6 +236,6 @@ class TweetRailTests(unittest.TestCase):
         tweeter = MockTweeterApi()
         queries = MockQueries(services=[])
         rt = RailTweeter(tweeter, queries, "THA", "PAD", "Fred")
-        rt.do_it(datetime.now())
+        rt.do_it()
         tweet = tweeter.tweets[0]
         assert "{0} PAD - THA".format(emoji_train) in tweet

@@ -1,4 +1,5 @@
 import argparse
+from datetime import datetime
 from tweeting import RealTweeterApi
 from queries import RealQueries
 
@@ -10,17 +11,25 @@ emoji_late = "\xF0\x9F\x95\x93"
 
 
 class RailTweeter:
-    def __init__(self, tweeter, queries, origin, destination):
+    def __init__(self, tweeter, queries, home, work, users):
         self.tweeter = tweeter
         self.queries = queries
-        self.origin = origin
-        self.destination = destination
+        self.home = home
+        self.work = work
+        self.users = users.split(",")
 
-    def do_it(self):
-        services = list(self.queries.services_between(self.origin, self.destination))
+    def do_it(self, now):
+        if now.hour < 12:
+            origin = self.home
+            destination = self.work
+        else:
+            origin = self.work
+            destination = self.home
 
-        self.tweet_digest(services)
-        self.direct_messages(services)
+        services = list(self.queries.services_between(origin, destination))
+
+        self.tweet_digest(services, origin, destination)
+        self.direct_messages(services, now)
 
     @staticmethod
     def get_emoji(ser):
@@ -42,14 +51,14 @@ class RailTweeter:
     def destination_str(ser):
         return ser["destination"][:10].strip()
 
-    def tweet_digest(self, services):
+    def tweet_digest(self, services, origin, destination):
         lines = map(lambda ser: "{0} {1} {2} {3}".format(self.get_emoji(ser),
                                                          ser["std"],
                                                          self.destination_str(ser),
                                                          self.etd_str(ser)),
                     services)
 
-        message = "{0} {1} - {2}: \n".format(emoji_train, self.origin, self.destination)
+        message = "{0} {1} - {2}: \n".format(emoji_train, origin, destination)
 
         if len(lines) == 0:
             message += "\nNo services"
@@ -62,16 +71,59 @@ class RailTweeter:
         print message
         self.tweeter.tweet(message)
 
-    def direct_messages(self, services):
+    @staticmethod
+    def messages_allowed_at_this_time(now):
+        return now.weekday() < 5 and 6 <= now.hour < 22
+
+    def direct_messages(self, services, now):
+        if self.messages_allowed_at_this_time(now):
+            self.process_cancellations(services)
+            self.process_late_trains(services)
+
+    @staticmethod
+    def time_to_mins(time_str):
+        try:
+            splits = time_str.split(":")
+            h = int(splits[0])
+            m = int(splits[1])
+            return (h * 60) + m
+        except:
+            return -1
+
+    def process_late_trains(self, services):
+        late_trains = filter(lambda x: x["etd"].lower() != x["std"].lower()
+                                       and x["etd"].lower() != "on time"
+                                       and x["etd"].lower() != "cancelled"
+                                       and x["etd"].lower() != "delayed", services)
+        for service in late_trains:
+            std = self.time_to_mins(service["std"])
+            etd = self.time_to_mins(service["etd"])
+
+            if etd > 0 and std > 0 and etd - std >= 15:
+                message = "{0} {1} from {2} to {3} delayed expected {4}".format(
+                        emoji_late,
+                        service["std"],
+                        service["origin"],
+                        service["destination"],
+                        service["etd"]
+                )
+                self.send_dm(message)
+
+    def process_cancellations(self, services):
         cancellations = filter(lambda x: x["etd"].lower() == "cancelled", services)
+
         for service in cancellations:
             message = "{0} {1} from {2} to {3} has been cancelled".format(
-                emoji_skull,
-                service["std"],
-                service["origin"],
-                service["destination"]
+                    emoji_skull,
+                    service["std"],
+                    service["origin"],
+                    service["destination"]
             )
-            self.tweeter.message("DanteLore", message)
+            self.send_dm(message)
+
+    def send_dm(self, message):
+        for user in self.users:
+            self.tweeter.message(user, message)
 
 
 if __name__ == "__main__":
@@ -82,9 +134,10 @@ if __name__ == "__main__":
     parser.add_argument('--access-token', help='Access Token', required=True)
     parser.add_argument('--access-token-secret', help='Access Token Secret', required=True)
     parser.add_argument('--url', help='API URL', default="http://lite.realtime.nationalrail.co.uk/OpenLDBWS/ldb9.asmx")
+    parser.add_argument('--users', help='Users to DM (comma separated)', default="ThatchamTrains")
     args = parser.parse_args()
 
     twitter = RealTweeterApi(args.consumer_key, args.consumer_secret, args.access_token, args.access_token_secret)
     queries = RealQueries(args.url, args.rail_key)
-    rt = RailTweeter(twitter, queries, origin="PAD", destination="THA")
-    rt.do_it()
+    rt = RailTweeter(twitter, queries, home="THA", work="PAD", users=args.users)
+    rt.do_it(datetime.now())

@@ -7,6 +7,8 @@ from twitterrail.tweeting import RealTweeterApi
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Tweeting about railways')
+    parser.add_argument('--home', help='Home station CRS', default="THA")
+    parser.add_argument('--work', help='Work station CRS', default="PAD")
     parser.add_argument('--rail-key', help='API Key', required=True)
     parser.add_argument('--consumer-key', help='Consumer Key', required=True)
     parser.add_argument('--consumer-secret', help='Consumer Secret', required=True)
@@ -19,7 +21,7 @@ if __name__ == "__main__":
 
     twitter = RealTweeterApi(args.consumer_key, args.consumer_secret, args.access_token, args.access_token_secret)
     queries = RealQueries(args.url, args.rail_key)
-    rt = RailTweeter(twitter, queries, home="THA", work="PAD", users=args.users)
+    rt = RailTweeter(twitter, queries, home=args.home, work=args.work, users=args.users)
 
     while True:
         try:

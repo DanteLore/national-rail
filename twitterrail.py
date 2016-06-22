@@ -19,4 +19,4 @@ if __name__ == "__main__":
     twitter = RealTweeterApi(args.consumer_key, args.consumer_secret, args.access_token, args.access_token_secret)
     queries = RealQueries(args.url, args.rail_key)
     rt = RailTweeter(twitter, queries, home="THA", work="PAD", users=args.users)
-    rt.do_it(datetime.now())
+    rt.do_it()

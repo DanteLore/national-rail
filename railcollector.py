@@ -93,7 +93,7 @@ if __name__ == "__main__":
                 delete_where(args.db, "departures", "crs == '{0}'".format(crs))
                 insert_into_db(args.db, "departures", departures)
                 sleep(1)
-            except:
-                print "Error"
+            except Exception as e:
+                print e.message
 
         sleep(10)

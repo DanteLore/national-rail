@@ -22,7 +22,10 @@ if __name__ == "__main__":
     rt = RailTweeter(twitter, queries, home="THA", work="PAD", users=args.users)
 
     while True:
-        rt.do_it()
+        try:
+            rt.do_it()
+        except Exception as e:
+            print e.message
         if not args.forever:
             break
         sleep(300)

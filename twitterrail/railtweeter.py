@@ -44,17 +44,25 @@ class RailTweeter:
         if ser["etd"].lower() == "cancelled" or ser["etd"].lower() == "on time":
             return ""
         else:
-            return ser["etd"]
+            return " {0}".format(ser["etd"])
+
+    @staticmethod
+    def platform_str(ser):
+        if ser["platform"] != "-":
+            return " P{0}".format(ser["platform"])
+        else:
+            return ""
 
     @staticmethod
     def destination_str(ser):
         return ser["destination"][:10].strip()
 
     def tweet_digest(self, services, origin, destination):
-        lines = map(lambda ser: "{0} {1} {2} {3}".format(self.get_emoji(ser),
+        lines = map(lambda ser: "{0} {1} {2}{3}{4}".format(self.get_emoji(ser),
                                                          ser["std"],
                                                          self.destination_str(ser),
-                                                         self.etd_str(ser)),
+                                                         self.etd_str(ser),
+                                                         self.platform_str(ser)),
                     services)
 
         message = "{0} {1} - {2}: \n".format(emoji_train, origin, destination)

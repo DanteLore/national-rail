@@ -158,6 +158,19 @@ class TweetRailTests(unittest.TestCase):
         assert "{0} 11:18 Bedwyn".format(emoji_tick) in tweet
 
     @freeze_time("2016-01-01 07:00:00")
+    def test_normal_train_with_platform(self):
+        tweeter = MockTweeterApi()
+        queries = MockQueries(services=[
+            {'origin': 'London Paddington', 'destination': u'Bedwyn', 'platform': '2', 'std': u'11:18',
+             'etd': u'On time'}
+        ])
+        rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
+        rt.do_it()
+        tweet = tweeter.tweets[0]
+        assert "{0} PAD - THA".format(emoji_train) in tweet
+        assert "{0} 11:18 Bedwyn P2".format(emoji_tick) in tweet
+
+    @freeze_time("2016-01-01 07:00:00")
     def test_cancelled_train(self):
         tweeter = MockTweeterApi()
         queries = MockQueries(services=[
@@ -202,17 +215,17 @@ class TweetRailTests(unittest.TestCase):
     def test_tweet_cropped_at_140_chars(self):
         tweeter = MockTweeterApi()
         queries = MockQueries(services=[
-            {'origin': 'London Paddington', 'destination': u'Station 1', 'platform': '-', 'std': u'01:18',
+            {'origin': 'London Paddington', 'destination': u'Station 1', 'platform': '1', 'std': u'01:18',
              'etd': u'On time'},
-            {'origin': 'London Paddington', 'destination': u'Station 2', 'platform': '-', 'std': u'02:18',
+            {'origin': 'London Paddington', 'destination': u'Station 2', 'platform': '2', 'std': u'02:18',
              'etd': u'On time'},
-            {'origin': 'London Paddington', 'destination': u'Station 3', 'platform': '-', 'std': u'03:18',
+            {'origin': 'London Paddington', 'destination': u'Station 3', 'platform': '3', 'std': u'03:18',
              'etd': u'On time'},
-            {'origin': 'London Paddington', 'destination': u'Station 4', 'platform': '-', 'std': u'04:18',
+            {'origin': 'London Paddington', 'destination': u'Station 4', 'platform': '4', 'std': u'04:18',
              'etd': u'On time'},
-            {'origin': 'London Paddington', 'destination': u'Station 5', 'platform': '-', 'std': u'05:18',
+            {'origin': 'London Paddington', 'destination': u'Station 5', 'platform': '5', 'std': u'05:18',
              'etd': u'On time'},
-            {'origin': 'London Paddington', 'destination': u'Station 6', 'platform': '-', 'std': u'06:18',
+            {'origin': 'London Paddington', 'destination': u'Station 6', 'platform': '6', 'std': u'06:18',
              'etd': u'On time'}
         ])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")

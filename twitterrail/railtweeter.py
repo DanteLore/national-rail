@@ -14,6 +14,7 @@ class RailTweeter:
         self.home = home
         self.work = work
         self.users = users.split(",")
+        self.last_message = ""
 
     def do_it(self):
         now = datetime.now()
@@ -66,8 +67,7 @@ class RailTweeter:
                 break
             message = message + "\n" + line
 
-        print message
-        self.tweeter.tweet(message)
+        self.send_tweet(message)
 
     @staticmethod
     def messages_allowed_at_this_time(now):
@@ -118,6 +118,14 @@ class RailTweeter:
                     service["destination"]
             )
             self.send_dm(message)
+
+    # Duplicate tweets are less annoying than duplicate messages, so are handled in a much more simple manner
+    # The twitter API itself picks up the duplicate if one sneaks past here.
+    def send_tweet(self, message):
+        if message != self.last_message:
+            print message
+            self.last_message = message
+            self.tweeter.tweet(message)
 
     def send_dm(self, message):
         for user in self.users:

@@ -26,7 +26,6 @@ class TweetRailTests(unittest.TestCase):
                    "message": "{0} 11:18 from London Paddington to Bedwyn has been cancelled".format(emoji_skull)
                } in tweeter.messages
 
-
     def test_dm_goes_to_correct_users(self):
         tweeter = MockTweeterApi()
         queries = MockQueries(services=[
@@ -239,3 +238,15 @@ class TweetRailTests(unittest.TestCase):
         rt.do_it()
         tweet = tweeter.tweets[0]
         assert "{0} PAD - THA".format(emoji_train) in tweet
+
+    def test_do_not_duplicate_tweets(self):
+        tweeter = MockTweeterApi()
+        queries = MockQueries(services=[
+            {'origin': 'London Paddington', 'destination': u'Bedwyn', 'platform': '-', 'std': u'11:18',
+             'etd': u'Cancelled'}
+        ])
+        rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
+        rt.do_it()
+        rt.do_it()
+        rt.do_it()
+        self.assertEqual(len(tweeter.tweets), 1)

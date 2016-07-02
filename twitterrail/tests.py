@@ -9,6 +9,7 @@ from twitterrail.railtweeter import RailTweeter, emoji_cross, emoji_tick, emoji_
 
 class TweetRailTests(unittest.TestCase):
     # Test the direct messaging service
+    @freeze_time("2016-06-17 17:00:00")
     def test_do_not_duplicate_messages(self):
         tweeter = MockTweeterApi()
         queries = MockQueries(services=[
@@ -26,6 +27,7 @@ class TweetRailTests(unittest.TestCase):
                    "message": "{0} 11:18 from London Paddington to Bedwyn has been cancelled".format(emoji_skull)
                } in tweeter.messages
 
+    @freeze_time("2016-06-17 17:00:00")
     def test_dm_goes_to_correct_users(self):
         tweeter = MockTweeterApi()
         queries = MockQueries(services=[

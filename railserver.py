@@ -1,7 +1,7 @@
 import argparse
 import sqlite3
 from flask import Flask, jsonify, send_from_directory
-from flask.ext.cors import CORS
+from flask_cors import CORS
 
 # http://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask
 from werkzeug.utils import redirect

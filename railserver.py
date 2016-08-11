@@ -9,6 +9,7 @@ from werkzeug.utils import redirect
 app = Flask(__name__)
 CORS(app)
 
+
 def read_calling_points(all_points):
     points = []
 

@@ -17,6 +17,7 @@ if __name__ == "__main__":
     parser.add_argument('--consumer-secret', help='Consumer Secret for Twitter', required=True)
     parser.add_argument('--access-token', help='Access Token for Twitter', required=True)
     parser.add_argument('--access-token-secret', help='Access Token Secret for Twitter', required=True)
+    parser.add_argument('--log-level', help='Log level to use. Default=INFO', default="INFO")
     args = parser.parse_args()
 
     logger = logging.getLogger("JiraBot")

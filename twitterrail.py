@@ -20,9 +20,11 @@ if __name__ == "__main__":
     parser.add_argument('--log-level', help='Log level to use. Default=INFO', default="INFO")
     args = parser.parse_args()
 
-    logger = logging.getLogger("JiraBot")
+    logger = logging.getLogger("TwitterRail")
+    streamHandler = logging.StreamHandler()
+    streamHandler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s'))
     logger.setLevel(args.log_level)
-    logger.addHandler(logging.StreamHandler())
+    logger.addHandler(streamHandler)
 
     twitter = RealTweeterApi(args.consumer_key, args.consumer_secret, args.access_token, args.access_token_secret)
     queries = RealQueries("http://lite.realtime.nationalrail.co.uk/OpenLDBWS/ldb9.asmx", args.rail_key)

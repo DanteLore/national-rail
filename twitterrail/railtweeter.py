@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 emoji_skull = "\xF0\x9F\x92\x80"
@@ -8,13 +9,20 @@ emoji_late = "\xF0\x9F\x95\x93"
 
 
 class RailTweeter:
-    def __init__(self, tweeter, queries, home, work, users):
+    def __init__(self, tweeter, queries, home, work, users, logger=None):
         self.tweeter = tweeter
         self.queries = queries
         self.home = home
         self.work = work
         self.users = users.split(",")
         self.last_message = ""
+
+        if logger:
+            self.logger = logger
+        else:
+            self.logger = logging.getLogger("TESTING")
+            self.logger.setLevel("DEBUG")
+            self.logger.addHandler(logging.StreamHandler())
 
     def do_it(self):
         now = datetime.now()
@@ -130,8 +138,10 @@ class RailTweeter:
     # Duplicate tweets are less annoying than duplicate messages, so are handled in a much more simple manner
     # The twitter API itself picks up the duplicate if one sneaks past here.
     def send_tweet(self, message):
-        if message != self.last_message:
-            print message
+        if message == self.last_message:
+            self.logger.info("Tweet is a duplicate, not sent '{0}'".format(message))
+        else:
+            self.logger.info("Sending Tweet '{0}'".format(message))
             self.last_message = message
             self.tweeter.tweet(message)
 
@@ -144,7 +154,7 @@ class RailTweeter:
                     sent_messages
             )
             if len(previous) > 0:
-                print "Identical message sent to {0} already today".format(user)
+                self.logger.info("Identical direct message sent to {0} already today".format(user))
             else:
-                print "Messaging {0}".format(user)
+                self.logger.info("Sending direct message to {0}: '{1}'".format(user, message))
                 self.tweeter.message(user, message)

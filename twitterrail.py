@@ -1,4 +1,5 @@
 import argparse
+import logging
 from time import sleep
 
 from twitterrail.queries import RealQueries
@@ -18,15 +19,19 @@ if __name__ == "__main__":
     parser.add_argument('--access-token-secret', help='Access Token Secret for Twitter', required=True)
     args = parser.parse_args()
 
+    logger = logging.getLogger("JiraBot")
+    logger.setLevel(args.log_level)
+    logger.addHandler(logging.StreamHandler())
+
     twitter = RealTweeterApi(args.consumer_key, args.consumer_secret, args.access_token, args.access_token_secret)
     queries = RealQueries("http://lite.realtime.nationalrail.co.uk/OpenLDBWS/ldb9.asmx", args.rail_key)
-    rt = RailTweeter(twitter, queries, home=args.home, work=args.work, users=args.users)
+    rt = RailTweeter(twitter, queries, home=args.home, work=args.work, users=args.users, logger=logger)
 
     while True:
         try:
             rt.do_it()
         except Exception as e:
-            print e.message
+            logger.exception("I crashed")
         if not args.forever:
             break
         sleep(300)

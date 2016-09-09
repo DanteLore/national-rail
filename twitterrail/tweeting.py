@@ -1,3 +1,5 @@
+import logging
+
 from twitter import Twitter, OAuth, TwitterHTTPError
 from datetime import datetime
 
@@ -19,16 +21,21 @@ class MockTweeterApi:
 
 
 class RealTweeterApi:
-    def __init__(self, consumer_key, consumer_secret, access_token, access_token_secret):
-        self.twitter = Twitter(
-                auth=OAuth(access_token, access_token_secret, consumer_key, consumer_secret)
-        )
+    def __init__(self, consumer_key, consumer_secret, access_token, access_token_secret, logger=None):
+        if logger:
+            self.logger = logger
+        else:
+            self.logger = logging.getLogger("TESTING")
+            self.logger.setLevel("DEBUG")
+            self.logger.addHandler(logging.StreamHandler())
+
+        self.twitter = Twitter(auth=OAuth(access_token, access_token_secret, consumer_key, consumer_secret))
 
     def tweet(self, message):
         try:
             self.twitter.statuses.update(status=message)
         except TwitterHTTPError as e:
-            print e.message
+            self.logger.exception("Failed to send tweet")
 
     def messages_sent_to(self, user):
         dms = map(lambda msg: {
@@ -43,4 +50,4 @@ class RealTweeterApi:
         try:
             self.twitter.direct_messages.new(user=user, text=message)
         except TwitterHTTPError as e:
-            print e.message
+            self.logger.exception("Failed to send direct message")

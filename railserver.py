@@ -1,11 +1,13 @@
 import argparse
 import sqlite3
 from flask import Flask, jsonify, send_from_directory
+from flask_cors import CORS
 
 # http://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask
 from werkzeug.utils import redirect
 
 app = Flask(__name__)
+CORS(app)
 
 
 def read_calling_points(all_points):

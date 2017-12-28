@@ -2,15 +2,7 @@ import requests
 import xmltodict
 
 
-class MockQueries:
-    def __init__(self, services=None):
-        self.services = services
-
-    def services_between(self, origin, destination):
-        return self.services
-
-
-class RealQueries:
+class Queries:
     def __init__(self, url, key):
         self.url = url
         self.headers = {'content-type': 'text/xml'}
@@ -34,8 +26,8 @@ class RealQueries:
 """.replace("{KEY}", key)
 
     def services_between(self, origin, destination):
-        xml = self.xml_payload\
-            .replace("{ORIG}", origin)\
+        xml = self.xml_payload \
+            .replace("{ORIG}", origin) \
             .replace("{DEST}", destination)
         response = requests.post(self.url, data=xml, headers=self.headers)
 

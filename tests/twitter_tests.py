@@ -2,9 +2,32 @@ import unittest
 
 from freezegun import freeze_time
 from datetime import datetime
-from queries import MockQueries
-from tweeting import MockTweeterApi
+
 from twitterrail.railtweeter import RailTweeter, emoji_cross, emoji_tick, emoji_train, emoji_late, emoji_skull
+
+
+class MockTweeterApi:
+    def __init__(self):
+        self.tweets = []
+        self.messages = []
+
+    def tweet(self, message):
+        self.tweets.append(message)
+
+    def messages_sent_to(self, user):
+        user_messages = filter(lambda msg: msg["user"] == user, self.messages)
+        return user_messages
+
+    def message(self, user, message):
+        self.messages.append({"user": user, "message": message, "timestamp": datetime.now()})
+
+
+class MockQueries:
+    def __init__(self, services=None):
+        self.services = services
+
+    def services_between(self, origin, destination):
+        return self.services
 
 
 class TweetRailTests(unittest.TestCase):
@@ -214,7 +237,7 @@ class TweetRailTests(unittest.TestCase):
         self.assertTrue("{0} 11:18 This is a".format(emoji_tick) in tweet)
 
     @freeze_time("2016-01-01 07:00:00")
-    def test_tweet_cropped_at_140_chars(self):
+    def test_tweet_cropped_at_280_chars(self):
         tweeter = MockTweeterApi()
         queries = MockQueries(services=[
             {'origin': 'London Paddington', 'destination': u'Station 1', 'platform': '1', 'std': u'01:18',
@@ -228,13 +251,25 @@ class TweetRailTests(unittest.TestCase):
             {'origin': 'London Paddington', 'destination': u'Station 5', 'platform': '5', 'std': u'05:18',
              'etd': u'On time'},
             {'origin': 'London Paddington', 'destination': u'Station 6', 'platform': '6', 'std': u'06:18',
+             'etd': u'On time'},
+            {'origin': 'London Paddington', 'destination': u'Station 7', 'platform': '7', 'std': u'07:18',
+             'etd': u'On time'},
+            {'origin': 'London Paddington', 'destination': u'Station 8', 'platform': '8', 'std': u'08:18',
+             'etd': u'On time'},
+            {'origin': 'London Paddington', 'destination': u'Station 9', 'platform': '9', 'std': u'09:18',
+             'etd': u'On time'},
+            {'origin': 'London Paddington', 'destination': u'Station 10', 'platform': '10', 'std': u'10:18',
+             'etd': u'On time'},
+            {'origin': 'London Paddington', 'destination': u'Station 10', 'platform': '11', 'std': u'11:18',
+             'etd': u'On time'},
+            {'origin': 'London Paddington', 'destination': u'Station 10', 'platform': '12', 'std': u'12:18',
              'etd': u'On time'}
         ])
         rt = RailTweeter(tweeter, queries, "PAD", "THA", "Fred")
         rt.do_it()
         tweet = tweeter.tweets[0]
         self.assertTrue("{0} PAD - THA".format(emoji_train) in tweet)
-        self.assertFalse("06:18" in tweet)
+        self.assertFalse("12:18" in tweet)
 
     @freeze_time("2016-01-01 07:00:00")
     def test_home_to_work_in_the_morning(self):

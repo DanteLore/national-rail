@@ -66,12 +66,12 @@ class RailTweeter:
         return ser["destination"][:10].strip()
 
     def tweet_digest(self, services, origin, destination):
-        lines = map(lambda ser: "{0} {1} {2}{3}{4}".format(self.get_emoji(ser),
+        lines = list(map(lambda ser: "{0} {1} {2}{3}{4}".format(self.get_emoji(ser),
                                                          ser["std"],
                                                          self.destination_str(ser),
                                                          self.etd_str(ser),
                                                          self.platform_str(ser)),
-                    services)
+                    services))
 
         message = "{0} {1} - {2}: \n".format(emoji_train, origin, destination)
 
@@ -79,7 +79,7 @@ class RailTweeter:
             message += "\nNo services"
 
         for line in lines:
-            if len(message) + len(line) > 140:
+            if len(message) + len(line) > 280:
                 break
             message = message + "\n" + line
 
@@ -148,11 +148,11 @@ class RailTweeter:
     def send_dm(self, message):
         for user in self.users:
             sent_messages = self.tweeter.messages_sent_to(user)
-            previous = filter(
+            previous = list(filter(
                     lambda msg: msg["message"] == message and
                                 (datetime.now() - msg["timestamp"]).days < 1,
                     sent_messages
-            )
+            ))
             if len(previous) > 0:
                 self.logger.info("Identical direct message sent to {0} already today".format(user))
             else:

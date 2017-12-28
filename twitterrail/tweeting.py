@@ -4,23 +4,7 @@ from twitter import Twitter, OAuth, TwitterHTTPError
 from datetime import datetime
 
 
-class MockTweeterApi:
-    def __init__(self):
-        self.tweets = []
-        self.messages = []
-
-    def tweet(self, message):
-        self.tweets.append(message)
-
-    def messages_sent_to(self, user):
-        user_messages = filter(lambda msg: msg["user"] == user, self.messages)
-        return user_messages
-
-    def message(self, user, message):
-        self.messages.append({"user": user, "message": message, "timestamp": datetime.now()})
-
-
-class RealTweeterApi:
+class TweeterApi:
     def __init__(self, consumer_key, consumer_secret, access_token, access_token_secret, logger=None):
         if logger:
             self.logger = logger

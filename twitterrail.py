@@ -2,9 +2,9 @@ import argparse
 import logging
 from time import sleep
 
-from twitterrail.queries import RealQueries
+from twitterrail.queries import Queries
 from twitterrail.railtweeter import RailTweeter
-from twitterrail.tweeting import RealTweeterApi
+from twitterrail.tweeting import TweeterApi
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Tweeting about railways')
@@ -26,8 +26,8 @@ if __name__ == "__main__":
     logger.setLevel(args.log_level)
     logger.addHandler(streamHandler)
 
-    twitter = RealTweeterApi(args.consumer_key, args.consumer_secret, args.access_token, args.access_token_secret)
-    queries = RealQueries("http://lite.realtime.nationalrail.co.uk/OpenLDBWS/ldb9.asmx", args.rail_key)
+    twitter = TweeterApi(args.consumer_key, args.consumer_secret, args.access_token, args.access_token_secret)
+    queries = Queries("http://lite.realtime.nationalrail.co.uk/OpenLDBWS/ldb9.asmx", args.rail_key)
     rt = RailTweeter(twitter, queries, home=args.home, work=args.work, users=args.users, logger=logger)
 
     while True:

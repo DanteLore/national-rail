@@ -4,7 +4,7 @@ ROOT=`pwd`
 TARGET=/tmp/twitterrail-lambda-target
 ZIP=~/twitterrail_lambda.zip
 SOURCE_FILES=(twitterrail twitterrail_lambda.py)
-LIBRARIES=(requests datetime logging xmltodict twitter boto os base64)
+LIBRARIES=(requests datetime logging xmltodict twitter os base64)
 
 # Create the temp target dir
 mkdir ${TARGET}

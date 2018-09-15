@@ -27,7 +27,7 @@ class TweeterApi:
             "timestamp": datetime.strptime(msg["created_at"], '%a %b %d %H:%M:%S +0000 %Y'),
             "message": msg["text"].encode('utf-8')
         }, self.twitter.direct_messages.sent(count=100, include_rts=1))
-        user_messages = filter(lambda msg: msg["user"] == user, dms)
+        user_messages = filter(lambda msg: msg["user"].lower() == user.lower(), dms)
         return user_messages
 
     def message(self, user, message):
